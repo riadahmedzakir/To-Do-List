@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    <style>
+    body {
+        background-image: url("bg-img.jpg");
+        background-color: rgb(37, 38, 37);
+        background-repeat: no-repeat;
+        width: 100%;
+        height: 200px;
+        max-height: 900px;
+    }
+
+    .heading {
+        height: 60px;
+        width: 400px;
+        text-align: center;
+        margin-top: 30px;
+        font-size: 25px;
+        font-weight: bold;
+    }
+
+    .sub-container {
+        height: 80px;
+        width: 400px;
+        text-align: center;
+        margin-top: 30px;
+        padding-top: 20px;
+    }
+
+    .sub-container-toDoList {
+        height: 80px;
+        width: 400px;
+        text-align: center;
+        margin-top: 0px;
+        padding-top: 20px;
+    }
+
+    .btn-style {
+        width: 90px;
+        height: 40px;
+        margin: 0px;
+        border: 0px;
+        padding: 0px;
+        text-align: center;
+    }
+
+    #inputContainer {
+        height: 500px;
+        overflow: auto;
+    }
+
+    #inputContainer::-webkit-scrollbar {
+        display: none; // Safari and Chrome
+    }
+
+    .alert {
+        margin-bottom: 5px;
+    }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                <div class="row justify-content-center">
+                    <div class="col-md-8 align-self-center alert alert-info heading">Add New Task</div>
+                    <div class="col-md-8 align-self-center alert alert-secondary sub-container">
+                        <div class="input-group">
+                            <input id="newTask" type="text" class="form-control" placeholder="Add Task...">
+                            <span id="taskButtons" class="input-group-btn"></span>
+                            <button id="addTask" class="btn btn-secondary" type="button" onclick="addTask(); toDoListDisplay(0);">Add Task</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="toDoDiv" class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                <div class="row justify-content-center">
+                    <div class="col-md-8 align-self-center alert alert-danger heading"> To Do List </div>
+                    <div class="col-md-8 align-self-center button-container btn-container row justify-content-center">
+                        <button id="filterAll" type="button" class="btn btn-outline-info btn-style col-md-4">All</button>
+                        <button id="filterToDo" type="button" class="btn btn-outline-info btn-style col-md-4">To Do</button>
+                        <button id="filterComplete" type="button" class="btn btn-outline-info btn-style col-md-4">Complete</button>
+                    </div>
+                </div>
+                <div id="inputContainer" class="row justify-content-center">
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+    <script>
+    (function() {
+        "use strict";
+
+        var vm = window;
+
+        vm.addTask = function() {
+            var newTaskName = document.getElementById("newTask").value;
+            var taskStatus = "notcom";
+
+            if (localStorage.getItem("savedTask") === null) {
+                var newTask = [
+                    [parseInt(localStorage.taskID), newTaskName, taskStatus]
+                ];
+                var myJSON = JSON.stringify(newTask);
+                localStorage.setItem("savedTask", myJSON);
+                var tempID = parseInt(localStorage.taskID);
+                tempID++;
+                localStorage.setItem("taskID", tempID);
+
+            } else {
+                var tempID = parseInt(localStorage.taskID);
+                var oldTask = JSON.parse(localStorage.savedTask);
+                oldTask.push([tempID, newTaskName, taskStatus]);
+                var myJSON = JSON.stringify(oldTask);
+                localStorage.setItem("savedTask", myJSON);
+                tempID++;
+                localStorage.setItem("taskID", tempID);
+            }
+        }
+
+        vm.toDoListDisplay = function(filterMode) {
+            document.getElementById("inputContainer").innerHTML = null;
+            var taskListed = JSON.parse(localStorage.savedTask);
+            if (filterMode === 0) {
+                taskListed.forEach(toDoList);
+            } else if (filterMode === 1) {
+                function checkStatus(task) {
+                    return task[2] === 'notcom';
+                }
+                var toDoFilter = taskListed.filter(checkStatus);
+                toDoFilter.forEach(toDoList);
+            } else if (filterMode === 2) {
+                function checkStatus(task) {
+                    return task[2] === 'com';
+                }
+                var completeFilter = taskListed.filter(checkStatus);
+                completeFilter.forEach(toDoList);
+            }
+        }
+
+        function toDoList(task) {
+            if (localStorage.getItem("savedTask") != null) {
+                var newDiv = document.createElement("div");
+                newDiv.classList.add('col-md-8');
+                // newDiv.classList.add('align-self-center');
+                newDiv.classList.add('alert');
+                newDiv.classList.add('alert-secondary');
+                newDiv.classList.add('sub-container-toDoList');
+                newDiv.setAttribute("id", "listedWork");
+                var element = document.getElementById("inputContainer");
+                element.appendChild(newDiv);
+
+                var inputDiv = document.createElement("div");
+                inputDiv.classList.add("input-group");
+                newDiv.appendChild(inputDiv);
+
+
+                //Checkbox
+                var checkboxSpan = document.createElement("span");
+                checkboxSpan.classList.add("input-group-addon");
+                inputDiv.appendChild(checkboxSpan);
+
+                var inputTaskCheckbox = document.createElement("input");
+                inputTaskCheckbox.setAttribute("type", "checkbox");
+                if (task[2] === "com") {
+                    inputTaskCheckbox.checked = true;
+                }
+                inputTaskCheckbox.addEventListener("click", function() {
+                    changeStatus(parseInt(task[0]));
+                });
+                inputTaskCheckbox.setAttribute("id", task[0]);
+                checkboxSpan.appendChild(inputTaskCheckbox);
+
+
+                //Task Input Box 
+                var taskNameInput = document.createElement("input");
+                taskNameInput.setAttribute("type", "text");
+                taskNameInput.setAttribute("id", "nameTask" + task[0]);
+                taskNameInput.classList.add("form-control");
+                taskNameInput.readOnly = true;
+                inputDiv.appendChild(taskNameInput);
+                var inputString = task[1];
+                taskNameInput.setAttribute("value", inputString);
+                var nodeInput = document.createTextNode(inputString);
+                taskNameInput.appendChild(nodeInput);
+
+
+                // Edit Button 
+                var editSpan = document.createElement("span");
+                editSpan.classList.add("input-group-btn");
+                inputDiv.appendChild(editSpan);
+
+                var editButton = document.createElement("button");
+                editButton.classList.add("btn");
+                editButton.classList.add("btn-primary");
+                editButton.setAttribute("type", "button");
+                editButton.setAttribute("id", "editTask" + task[0]);
+                var nodeEdit = document.createTextNode("Edit");
+                editButton.addEventListener("click", function() {
+                    editTask(task[0]);
+                })
+                editButton.appendChild(nodeEdit);
+                editSpan.appendChild(editButton);
+
+
+                //Delete Button 
+                var deleteSpan = document.createElement("span");
+                deleteSpan.classList.add("input-group-btn");
+                inputDiv.appendChild(deleteSpan);
+
+                var deleteButton = document.createElement("button");
+                deleteButton.classList.add("btn");
+                deleteButton.classList.add("btn-danger");
+                deleteButton.setAttribute("type", "button");
+                deleteButton.setAttribute("id", "deleteTask" + task[0]);
+                var nodeDelete = document.createTextNode("Delete");
+                deleteButton.addEventListener("click", function() {
+                    deleteTask(parseInt(task[0]));
+                })
+                deleteButton.appendChild(nodeDelete);
+                deleteSpan.appendChild(deleteButton);
+            }
+        }
+
+        function changeStatus(taskid) {
+            var taskListed = JSON.parse(localStorage.savedTask);
+            var taskIdIndex = checkIndexOf(taskid);
+
+            var taskstatus = taskListed[taskIdIndex][2];
+            if (taskstatus === "com") {
+                taskListed[taskIdIndex][2] = "notcom";
+            } else if (taskstatus === "notcom") {
+                taskListed[taskIdIndex][2] = "com";
+            }
+            var myJSON = JSON.stringify(taskListed);
+            localStorage.setItem("savedTask", myJSON);
+
+        }
+
+        function editConfirm(taskid) {
+            var taskListed = JSON.parse(localStorage.savedTask);
+            var taskname = document.getElementById("newTask").value;
+            var taskIdIndex = checkIndexOf(taskid);
+            taskListed[taskIdIndex][1] = taskname;
+            var myJSON = JSON.stringify(taskListed);
+            localStorage.setItem("savedTask", myJSON);
+            location.reload();
+        }
+
+        function editCancel(taskid) {
+            location.reload();
+        }
+
+        function editTask(taskid) {
+            var taskListed = JSON.parse(localStorage.savedTask);
+            var taskIdIndex = checkIndexOf(taskid);
+            var taskName = taskListed[taskIdIndex][1];
+            document.getElementById("newTask").value = taskName;
+
+            //Edit Button
+            var editTaskButton = document.createElement("button");
+            editTaskButton.setAttribute("id", "editTask");
+            editTaskButton.classList.add("btn");
+            editTaskButton.classList.add("btn-secondary");
+            editTaskButton.setAttribute("type", "button");
+            var nodeEdit = document.createTextNode("Confirm");
+            editTaskButton.appendChild(nodeEdit);
+            editTaskButton.addEventListener("click", function() {
+                editConfirm(taskid);
+            })
+
+            //Cancel Button 
+            var editCancelButton = document.createElement("button");
+            editCancelButton.setAttribute("id", "cancelTask");
+            editCancelButton.classList.add("btn");
+            editCancelButton.classList.add("btn-danger");
+            editCancelButton.setAttribute("type", "button");
+            var nodeCancel = document.createTextNode("Cancel");
+            editCancelButton.appendChild(nodeCancel);
+            editCancelButton.addEventListener("click", function() {
+                editCancel(taskid);
+            })
+
+            var elem1 = document.getElementById("addTask");
+            elem1.remove();
+            var elem2 = document.getElementById("taskButtons");
+            elem2.appendChild(editTaskButton);
+            elem2.appendChild(editCancelButton);
+
+        }
+
+        function deleteTask(taskid) {
+            var taskListed = JSON.parse(localStorage.savedTask);
+            var taskIdIndex = checkIndexOf(taskid);
+            taskListed.splice(taskIdIndex, 1);
+
+            var myJSON = JSON.stringify(taskListed);
+            localStorage.setItem("savedTask", myJSON);
+            location.reload();
+        }
+
+        function checkIndexOf(taskid) {
+            var taskListed = JSON.parse(localStorage.savedTask);
+            var result;
+            for (var i = 0; i <= taskListed.length; i++) {
+                if (taskListed[i][0] === taskid) {
+                    result = i;
+                    break;
+                }
+            }
+            return result;
+        }
+
+        function init() {
+
+            var filterAll = document.getElementById("filterAll");
+            filterAll.addEventListener("click", function() {
+                toDoListDisplay(0);
+            })
+
+            var filterToDo = document.getElementById("filterToDo");
+            filterToDo.addEventListener("click", function() {
+                toDoListDisplay(1);
+            })
+
+            var filterComplete = document.getElementById("filterComplete");
+            filterComplete.addEventListener("click", function() {
+                toDoListDisplay(2);
+            })
+
+            if (localStorage.getItem("taskID") === null) {
+                localStorage.setItem("taskID", 0);
+            }
+            if (localStorage.getItem("savedTask") != null) {
+                var taskListed = JSON.parse(localStorage.savedTask);
+                taskListed.forEach(toDoList);
+            }
+        }
+        init();
+
+    })(window);
+    </script>
+</body>
+
+</html>
