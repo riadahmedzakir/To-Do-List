@@ -1,0 +1,111 @@
+body {
+    background-image: url("../assets/bg-img.jpg");
+    background-color: rgb(37, 38, 37);
+    background-repeat: no-repeat;
+    width: 100%;
+    height: 200px;
+    max-height: 900px;
+}
+
+sup {
+    font-size: 12px;
+    font-style: italic;
+    color: #d11b4b;
+}
+
+.search-nav {
+    height: 150px;
+    overflow: hidden;
+    top: 0;
+    z-index: 2;
+}
+
+.heading {
+    height: 60px;
+    width: 400px;
+    text-align: center;
+    margin-top: 30px;
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.sub-container {
+    width: 400px;
+    text-align: center;
+    margin-top: 30px;
+    padding-top: 20px;
+}
+
+.input-group {
+    padding-bottom: 10px;
+}
+
+.error-message {
+    font-size: 12px;
+    font-style: italic;
+    color: #b70b2d;
+}
+
+.sub-container-toDoList {
+    height: 80px;
+    width: 400px;
+    text-align: center;
+    margin-top: 0px;
+    padding-top: 20px;
+}
+
+.btn-style {
+    width: 90px;
+    height: 40px;
+    margin: 0px;
+    border: 0px;
+    padding: 0px;
+    text-align: center;
+}
+
+#inputContainer {
+    height: 500px;
+    overflow: auto;
+}
+
+#inputContainer::-webkit-scrollbar {
+    display: none; // Safari and Chrome
+}
+
+.alert {
+    margin-bottom: 5px;
+}
+
+.task-card {
+    height: 260px;
+}
+
+.task-detail-container {
+    height: 48px;
+}
+
+.task-card>h2 {
+    border-bottom: 2px solid black;
+}
+
+.task-card>h2>sup {
+    position: absolute;
+    top: 37px;
+    right: 35px;
+}
+
+.material-icons {
+    font-size: 36px;
+    color: #ffe100;
+}
+
+.transparent-input {
+    background-color: transparent;
+    padding-left: 10px;
+    border: none;
+    color: #17a2b8;
+}
+
+.input-group {
+    position: relative;
+}
